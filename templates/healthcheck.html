@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}
+    <style>
+        #flash{
+            position: absolute;
+            text-align: center;
+            bottom: 200px;
+            left: 50%;
+            margin-left: -250px;
+            width: 500px;
+        }
+        .main_border {
+            text-align: center;
+        }
+        #container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background-color: lightgray;
+            border: ridge 4px black;
+            width: 500px;
+        }
+        #db_stats {
+            margin-right: -12px;
+        }
+        #health {
+            margin-right: 4px;
+        }
+        input[type='file'] {
+            font-size: 12px;
+        }
+        #file_name {
+            font-size: 10px;
+        }
+        #download_rrd_graphs_form {
+            margin-top: 10px;
+        }
+        .commented_out {
+            visibility: collapse;
+        }
+
+
+    </style>
+{% endblock %}
+{% block content %}
+  <h2>Health Check Workflow</h2>
+  <div id="container">
+      <div id="datarake_analysis">
+          <h4>Datarake Analysis</h4>
+          <form method="POST" action="/healthcheck/analyzedatarake" enctype="multipart/form-data">
+            <p class="hc_option">{{ health_check_form.rrd_graphs.label }}{{ health_check_form.rrd_graphs }}
+                {{ health_check_form.weeksneeded(**{'value': '12', 'max':'12', 'min':'1'}) }}
+            </p>
+            <p  id='db_stats' class="hc_option">{{ health_check_form.db_stats.label }}{{ health_check_form.db_stats }}</p>
+            <p id='health' class="hc_option">{{ health_check_form.dhcp_health.label }}{{ health_check_form.dhcp_health }}</p>
+            <p>{{ health_check_form.file.label }}</p>
+            <p id="file_name">{{ health_check_form.file(**{'accept':'.tgz'}) }}</p>
+            {{ health_check_form.csrf_token() }}
+            <p>{{ health_check_form.submit }}</p>
+          </form>
+      </div>
+  </div>
+<!-- Display flash messages -->
+  <div id="flash">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p>{{ msg }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+  </div>
+{% endblock %}

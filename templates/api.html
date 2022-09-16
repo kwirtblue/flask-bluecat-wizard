@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}
+    <style>
+        #flash{
+            position: absolute;
+            text-align: center;
+            top: 100px;
+            left: 50%;
+            margin-left: -250px;
+            width: 500px;
+        }
+        .main_border {
+            overflow: auto;
+        }
+        h3 {
+            margin-top: -10px;
+        }
+        h4 {
+            padding-left: 65px;
+            margin: 3px auto 0;
+        }
+        h5 {
+            margin-top: 3px;
+        }
+        .main_container {
+            display: flex;
+        }
+        .main_container div {
+            background-color: lightblue;
+        }
+        .inline_block {
+            display: inline-block;
+        }
+        #token_text {
+            font-size: smaller
+        }
+        #add_server_icon {
+            position: relative;
+            top: 5px;
+            left: 1.2px;
+        }
+        #toggle_add {
+            visibility: collapse;
+        }
+        #toggle_add:checked ~ .collapse {
+            visibility: collapse;
+        }
+        #remove_server_icon {
+            position: relative;
+            left: -25px;
+            bottom: -4px;
+        }
+        .collapse2 {
+            visibility: collapse;
+            position: absolute;
+        }
+        .show_picture {
+            visibility: visible;
+        }
+        p.system_info {
+            margin-top: -15px;
+            padding-left: 10px;
+            margin-right: 2px;
+        }
+        #api_login_div {
+            min-width: 575px;
+            max-width: 575px;
+        }
+        #system_info_div {
+            flex-basis: 210px;
+            min-width: 210px;
+            max-width: 210px;
+            min-height: 230px;
+            max-height: 230px;
+            border: ridge 4px #494861;
+        }
+        #timestamp {
+            padding-left: 25px;
+            display: block;
+            min-width: 30px;
+            margin-left:15px;
+            font-style: italic;
+            font-size: small
+        }
+        #history_div {
+            margin-top: 34.5px;
+            margin-left: -4px;
+            height: 250px;
+            min-width: 205px;
+            padding-left: 5px;
+            display: block;
+            border: ridge 4px #494861;
+            border-top: none;
+        }
+        #api_list {
+            min-width: 210px;
+            flex: 2 1 210px;
+            height: 482px;
+            padding-left: 5px;
+            background-color: lightblue;
+            left: 0;
+            border: ridge 4px #494861;
+            border-left: none;
+            border-right: none;
+        }
+        #api_reference {
+            min-width: 210px;
+            height: 482px;
+            padding-left: 5px;
+            background-color: lightblue;
+            left: 0;
+            border: ridge 4px #494861;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+  <!-- Display flash messages -->
+    <div id="flash">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for msg in messages %}
+                    <p>{{ msg }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <div class="title">
+        <h2>BlueCat API Runner</h2>
+    </div>
+    <div>
+        <div id="api_login_div">
+            <h3 class="inline_block">BAM API Login </h3>
+            <form class="inline_block" method="post" action="/api/addserver">
+                {{ api_login_form.csrf_token() }}
+                <label for="toggle_add" id="add_server_icon"><img src="/static/images/plus_sign.png" height="19" width="19"></label>
+                <input id="toggle_add" class="collapse" type="checkbox" checked>
+                <label for="remove_server" id="remove_server_icon" class=collapse2"><img src="/static/images/delete_server.png" height="17" width="17"></label>
+                <div class="inline_block collapse">
+                    {{ add_server_form.server_ip }}
+                    {{ add_server_form.add_button }}
+                </div>
+            </form>
+            <div class="bin">
+                <form method="post" action="/api/apilogin">
+                    {{ api_login_form.csrf_token() }}
+                    {{ api_login_form.host_ip }}
+                    {{ api_login_form.username_field() }}
+                    {{ api_login_form.password_field() }}
+                    {{ api_login_form.login_button() }}
+                </form>
+                {% if user.api_token %}
+                    <p id="token_text"><b>Your BAM API token is: </b>{{ user.api_token }}</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="main_container">
+            {% if user.system_info %}
+            <div id="system_info_div" class="column">
+                <h4>System Info</h4>
+                <span id="timestamp">as of {{ user.sys_info_timestamp }}
+                </span>
+                <div style="margin-top:15px;">
+                    {% set split_info = user.system_info.split("|") %}
+                    {% for item in split_info %}
+                        <p class="system_info">{{ item }}</p>
+                    {% endfor %}
+                </div>
+                <div id="history_div">
+                    <h5>API Call History</h5>
+                </div>
+            </div>
+            {% endif %}
+            <div id="api_list">
+                <h5>API List</h5>
+            </div>
+            <div id="api_reference">
+                <h5>API Reference</h5>
+            </div>
+        </div>
+    </div>
+
+
+<!-- hidden button, form, and onclick function to grab server choice from api_login_form.host_ip and submit it -->
+<form id="server_remove_form" method="post" action="/api/removeserver">
+    {{ api_login_form.csrf_token() }}
+    {{ confirm_delete_form.hidden_input }}
+    <div class="collapse2">
+    <button id="remove_server" class="collapse2" onclick="confirm_Delete()"></button>
+    </div>
+</form>
+<script>
+    function confirm_Delete() {
+        var server_choice_form = document.getElementById("server_remove_form")
+        var server_choice = document.getElementById("host_ip").value
+        document.getElementById("hidden_input").value = server_choice
+        if (server_choice) {
+            if (confirm("Are you sure you sure you want to remove " + server_choice + "?")) {
+                //        server_choice_form.submit()
+// prevent form from submitting
+            } else {
+                event.preventDefault()
+            }
+        }
+        else {
+            alert("No servers left in list!")
+            event.preventDefault()
+        }
+    }
+</script>
+{% endblock %}

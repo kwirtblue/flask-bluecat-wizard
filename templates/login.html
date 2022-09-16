@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}
+<style>
+  #flash{
+    position: absolute;
+    text-align: center;
+    top: 100px;
+    left: 50%;
+    margin-left: -250px;
+    width: 500px;
+  }
+  #nav_div {
+      visibility: collapse;
+  }
+  h1, form {
+    text-align: center;
+  }
+  #login_button {
+    margin-left: 60px;
+    width: 100px;
+  }
+  #logout{
+      visibility: hidden;
+  }
+  .logo {
+    text-align: center;
+    padding-top: 30px;
+  }
+  .border {
+    position: relative;
+    margin: 13vh 35vw auto;
+    border: black 1px solid;
+    background-color: lightblue;
+    height: 25rem;
+    width: 21rem;
+  }
+  .register_div {
+      position: relative;
+      text-align: center;
+      inset: .5em 46.5vw;
+      width: 150px;
+      color: black;
+  }
+  a#register_link:link, a#register_link:visited {
+      color: black;
+  }
+
+
+</style>
+{% endblock %}
+{% block content %}
+  <div class="border">
+    <div class="logo"><img src="/static/images/favicon.png" height="150" width="160"></div>
+    <h1 id="login">BlueCat Wizard Login</h1>
+    <form method="post">
+      {{ login_form.hidden_tag() }}
+      <div style="margin-bottom: 5px; margin-right: 60px;"><p>Username: {{login_form.username_field()}}</p></div>
+      <div style="margin-bottom: 10px; margin-right: 57px;"><p>Password: {{login_form.password_field()}}</p></div>
+      <div id="login_button">{{login_form.login_button()}}</div>
+    </form>
+  </div>
+  <div class="register_div"><a id="register_link" href="/register">Create New User</a></div>
+<!-- Display flash messages -->
+    <div id="flash">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for msg in messages %}
+                    <p>{{ msg }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+{% endblock %}

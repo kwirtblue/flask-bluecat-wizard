@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}
+    <style>
+      #flash{
+        position: absolute;
+        text-align: center;
+        top: 100px;
+        left: 50%;
+        margin-left: -250px;
+        width: 500px;
+      }
+    </style>
+{% endblock %}
+{% block content %}
+  <h2 id="dashboard">Dashboard</h2>
+  <p>Welcome {{ user.username }}!</p>
+<!-- Display flash messages -->
+    <div id="flash">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for msg in messages %}
+                    <p>{{ msg }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+{% endblock %}

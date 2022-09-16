@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}
+    <style>
+        #flash{
+            position: absolute;
+            text-align: center;
+            top: 100px;
+            left: 50%;
+            margin-left: -250px;
+            width: 500px;
+    }
+        h2 {
+            text-align:center;
+        }
+        #hc_box{
+            border: black 5px ridge;
+            border-bottom-color: black;
+            width: 300px;
+            height: 300px;
+            text-align: center;
+            margin: 150px auto;
+        }
+        form{
+            text-align: right;
+            margin-top: 50px;
+            margin-right:25px;
+        }
+        #hc_submit{
+            position: relative;
+            top:100px;
+            margin-right: 50px;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+<h2>BlueCat Automated Health Check</h2>
+<!-- Display flash messages -->
+    <div id="flash">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for msg in messages %}
+                    <p>{{ msg }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <div id="hc_box">
+        <form method="POST" action="/analyzer">
+            <p>{{ hc_form.csrf_token() }}</p>
+            <p>Customer : {{ hc_form.customer_selection }}</p>
+            <p>Case Number : {{ hc_form.case_number }}</p>
+            <p>DB Server IP : {{ hc_form.server_ip }}</p>
+            <p id="hc_submit">{{ hc_form.submit }}</p>
+        </form>
+    </div>
+{% endblock %}
